@@ -1,0 +1,153 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #444;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Search and Button Container */
+div {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+input[type="text"] {
+    padding: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Form Popup Styles */
+#formPopup {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: 0 auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+#formPopup h2 {
+    margin-top: 0;
+    color: #444;
+}
+
+#formPopup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#formPopup input[type="text"],
+#formPopup input[type="datetime-local"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#formPopup button[type="submit"] {
+    background-color: #28a745;
+}
+
+#formPopup button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+#formPopup button[type="button"] {
+    background-color: #dc3545;
+}
+
+#formPopup button[type="button"]:hover {
+    background-color: #c82333;
+}
+
+/* FAQ, Message, and Link List Container Styles */
+#faqList, #messagesList, #linksList {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* FAQ, Message, and Link Individual Box Styles */
+.faq-item, .message-item, .link-item {
+    background-color: white;
+    border: 1px solid #ddd; /* Added border for FAQs */
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.faq-item:hover, .message-item:hover, .link-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.faq-item strong, .message-item strong, .link-item strong {
+    display: block;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.faq-item p, .message-item p, .link-item p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.link-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.link-item a:hover {
+    text-decoration: underline;
+}
+
+.delete-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}

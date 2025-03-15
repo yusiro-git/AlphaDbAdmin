@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Delayed Messages</title>
+        <link rel="stylesheet" href="/static/amogus.css">
+    </head>
+<body>
+    <h1>Delayed Messages</h1>
+    <div>
+        <input type="text" id="searchBox" placeholder="Search messages...">
+        <button onclick="searchMessages()">Search</button>
+        <button onclick="openForm()">New</button>
+    </div>
+    <div id="messagesList"></div>
+
+    <div id="formPopup" style="display:none;">
+        <h2>New Delayed Message</h2>
+        <form onsubmit="createMessage(event)">
+            <label for="message">Message:</label>
+            <input type="text" id="message" required>
+            <label for="date">Date:</label>
+            <input type="datetime-local" id="date" required>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+
+    <script>
+        function loadMessages() {
+            fetch('/api/messages/load')
+                .then(response => response.json())
+                .then(data => {
+                    const messagesList = document.getElementById('messagesList');
+                    messagesList.innerHTML = '';
+                    data.forEach(msg => {
+                        const messageItem = document.createElement('div');
+                        messageItem.className = 'message-item';
+                        messageItem.innerHTML = `
+                            <strong>${msg.message}</strong>
+                            <p>Scheduled for: ${msg.date}</p>
+                            <span class="delete-btn" onclick="deleteMessage(${msg.id})">Delete</span>
+                        `;
+                        messagesList.appendChild(messageItem);
+                    });
+                });
+        }
+
+        function deleteMessage(id) {
+            fetch(`/api/messages/delete?id=${id}`, { method: 'DELETE' })
+                .then(() => loadMessages());
+        }
+
+        function searchMessages() {
+            const query = document.getElementById('searchBox').value;
+            fetch(`/api/messages/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const messagesList = document.getElementById('messagesList');
+                    messagesList.innerHTML = '';
+                    data.forEach(msg => {
+                        const messageItem = document.createElement('div');
+                        messageItem.className = 'message-item';
+                        messageItem.innerHTML = `
+                            <strong>${msg.message}</strong>
+                            <p>Scheduled for: ${msg.date}</p>
+                            <span class="delete-btn" onclick="deleteMessage(${msg.id})">Delete</span>
+                        `;
+                        messagesList.appendChild(messageItem);
+                    });
+                });
+        }
+
+        function openForm() {
+            document.getElementById('formPopup').style.display = 'block';
+        }
+
+        function closeForm() {
+            document.getElementById('formPopup').style.display = 'none';
+        }
+
+        function createMessage(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            const date = document.getElementById('date').value;
+            fetch('/api/messages/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${encodeURIComponent(message)}&date=${encodeURIComponent(date)}`
+            }).then(() => {
+                loadMessages();
+                closeForm();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadMessages);
+    </script>
+</body>
+</html>

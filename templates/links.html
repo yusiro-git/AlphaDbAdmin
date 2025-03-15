@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Useful Links</title>
+        <link rel="stylesheet" href="/static/amogus.css">
+    </head>
+<body>
+    <h1>Useful Links</h1>
+    <div>
+        <input type="text" id="searchBox" placeholder="Search links...">
+        <button onclick="searchLinks()">Search</button>
+        <button onclick="openForm()">New</button>
+    </div>
+    <div id="linksList"></div>
+
+    <div id="formPopup" style="display:none;">
+        <h2>New Link</h2>
+        <form onsubmit="createLink(event)">
+            <label for="linktext">Link Text:</label>
+            <input type="text" id="linktext" required>
+            <label for="url">URL:</label>
+            <input type="text" id="url" required>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+
+    <script>
+        function loadLinks() {
+            fetch('/api/links/load')
+                .then(response => response.json())
+                .then(data => {
+                    const linksList = document.getElementById('linksList');
+                    linksList.innerHTML = '';
+                    data.forEach(link => {
+                        const linkItem = document.createElement('div');
+                        linkItem.className = 'link-item';
+                        linkItem.innerHTML = `
+                            <strong>${link.linktext}</strong>
+                            <p><a href="${link.url}" target="_blank">${link.url}</a></p>
+                            <span class="delete-btn" onclick="deleteLink(${link.id})">Delete</span>
+                        `;
+                        linksList.appendChild(linkItem);
+                    });
+                });
+        }
+
+        function deleteLink(id) {
+            fetch(`/api/links/delete?id=${id}`, { method: 'DELETE' })
+                .then(() => loadLinks());
+        }
+
+        function searchLinks() {
+            const query = document.getElementById('searchBox').value;
+            fetch(`/api/links/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const linksList = document.getElementById('linksList');
+                    linksList.innerHTML = '';
+                    data.forEach(link => {
+                        const linkItem = document.createElement('div');
+                        linkItem.className = 'link-item';
+                        linkItem.innerHTML = `
+                            <strong>${link.linktext}</strong>
+                            <p><a href="${link.url}" target="_blank">${link.url}</a></p>
+                            <span class="delete-btn" onclick="deleteLink(${link.id})">Delete</span>
+                        `;
+                        linksList.appendChild(linkItem);
+                    });
+                });
+        }
+
+        function openForm() {
+            document.getElementById('formPopup').style.display = 'block';
+        }
+
+        function closeForm() {
+            document.getElementById('formPopup').style.display = 'none';
+        }
+
+        function createLink(event) {
+            event.preventDefault();
+            const linktext = document.getElementById('linktext').value;
+            const url = document.getElementById('url').value;
+            fetch('/api/links/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `linktext=${encodeURIComponent(linktext)}&url=${encodeURIComponent(url)}`
+            }).then(() => {
+                loadLinks();
+                closeForm();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadLinks);
+    </script>
+</body>
+</html>

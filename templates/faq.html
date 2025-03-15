@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>FAQ Website</title>
+        <link rel="stylesheet" href="/static/amogus.css">
+    </head>
+<body>
+    <h1>FAQ Website</h1>
+    <div>
+        <input type="text" id="searchBox" placeholder="Search questions...">
+        <button onclick="searchFAQs()">Search</button>
+        <button onclick="openForm()">New</button>
+    </div>
+    <div id="faqList"></div>
+
+    <div id="formPopup" style="display:none;">
+        <h2>New FAQ</h2>
+        <form onsubmit="createFAQ(event)">
+            <label for="question">Question:</label>
+            <input type="text" id="question" required>
+            <label for="answer">Answer:</label>
+            <input type="text" id="answer" required>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+
+    <script>
+        function loadFAQs() {
+            fetch('/api/faqs/load')
+                .then(response => response.json())
+                .then(data => {
+                    const faqList = document.getElementById('faqList');
+                    faqList.innerHTML = '';
+                    data.forEach(faq => {
+                        const faqItem = document.createElement('div');
+                        faqItem.className = 'faq-item';
+                        faqItem.innerHTML = `
+                            <strong>${faq.question}</strong>
+                            <p>${faq.answer}</p>
+                            <span class="delete-btn" onclick="deleteFAQ(${faq.id})">Delete</span>
+                        `;
+                        faqList.appendChild(faqItem);
+                    });
+                });
+        }
+
+        function deleteFAQ(id) {
+            fetch(`/api/faqs/delete?id=${id}`, { method: 'DELETE' })
+                .then(() => loadFAQs());
+        }
+
+        function searchFAQs() {
+            const query = document.getElementById('searchBox').value;
+            fetch(`/api/faqs/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const faqList = document.getElementById('faqList');
+                    faqList.innerHTML = '';
+                    data.forEach(faq => {
+                        const faqItem = document.createElement('div');
+                        faqItem.className = 'faq-item';
+                        faqItem.innerHTML = `
+                            <strong>${faq.question}</strong>
+                            <p>${faq.answer}</p>
+                            <span class="delete-btn" onclick="deleteFAQ(${faq.id})">Delete</span>
+                        `;
+                        faqList.appendChild(faqItem);
+                    });
+                });
+        }
+
+        function openForm() {
+            document.getElementById('formPopup').style.display = 'block';
+        }
+
+        function closeForm() {
+            document.getElementById('formPopup').style.display = 'none';
+        }
+
+        function createFAQ(event) {
+            event.preventDefault();
+            const question = document.getElementById('question').value;
+            const answer = document.getElementById('answer').value;
+            fetch('/api/faqs/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `question=${encodeURIComponent(question)}&answer=${encodeURIComponent(answer)}`
+            }).then(() => {
+                loadFAQs();
+                closeForm();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFAQs);
+    </script>
+</body>
+</html>
