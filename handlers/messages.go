@@ -51,7 +51,7 @@ func (handler MessageHandler) GetMessages(w http.ResponseWriter, r *http.Request
 
 func (handler MessageHandler) DeleteMessage(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	_, err := handler.db.Exec(context.Background(), "DELETE FROM delayedmassages WHERE id = $1", id)
+	_, err := handler.db.Exec(context.Background(), "DELETE FROM delayedmessages WHERE id = $1", id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -62,7 +62,7 @@ func (handler MessageHandler) DeleteMessage(w http.ResponseWriter, r *http.Reque
 func (handler MessageHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("message")
 	date := r.FormValue("date")
-	_, err := handler.db.Exec(context.Background(), "INSERT INTO delayedmassage (message, date) VALUES ($1, $2)", message, date)
+	_, err := handler.db.Exec(context.Background(), "INSERT INTO delayedmessages (message, date) VALUES ($1, $2)", message, date)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
