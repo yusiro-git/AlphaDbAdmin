@@ -1,19 +1,22 @@
 package main
 
 import (
+	"AlphaDbAdmin/config"
 	"AlphaDbAdmin/handlers"
 	"AlphaDbAdmin/middleware"
+	"AlphaDbAdmin/storage/postgres"
+
 	"log"
 	"net/http"
-
-	"AlphaDbAdmin/storage/postgres"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	// Initialize database
-	db, err := postgres.New("postgres://postgres:Go@localhost:5432/alphatgbot")
+	conf := config.MustLoad()
+
+	//postgres://postgres:Go@localhost:5432/alphatgbot
+	db, err := postgres.New(conf.PostresConnectionURL)
 	if err != nil {
 		panic(err)
 	}
@@ -22,14 +25,13 @@ func main() {
 	r := mux.NewRouter()
 
 	// Auth routes
-	r.HandleFunc("/auth", handlers.AuthHandler).Methods("GET", "POST")
+	r.HandleFunc("/auth", handlers.AuthHandler(conf.AdminKey)).Methods("GET", "POST")
 
 	faq := handlers.NewFAQHandler(db)
 	links := handlers.NewLinksHandler(db)
 	messages := handlers.NewMessageHandler(db)
 
 	// Protected routes
-	log.Println("Protected routes")
 	protected := r.PathPrefix("/").Subrouter()
 	protected.Use(middleware.AuthMiddleware)
 	protected.HandleFunc("/", handlers.HomeHandler).Methods("GET") // Homepage route
@@ -54,6 +56,6 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// Start server
-	log.Println("Server started on :8081")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8081", r))
+	log.Println("Server started on :6969")
+	log.Fatal(http.ListenAndServe("0.0.0.0:6969", r))
 }

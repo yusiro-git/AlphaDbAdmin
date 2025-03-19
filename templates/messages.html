@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Delayed Messages</title>
-        <link rel="stylesheet" href="/static/amogus.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delayed Messages</title>
+    <link rel="stylesheet" href="/static/amogus.css">
+</head>
 <body>
     <h1>Delayed Messages</h1>
     <div>
@@ -18,10 +18,20 @@
     <div id="formPopup" style="display:none;">
         <h2>New Delayed Message</h2>
         <form onsubmit="createMessage(event)">
+            <label for="group_name">Group Name:</label>
+            <input type="text" id="group_name" required>
+            
             <label for="message">Message:</label>
             <input type="text" id="message" required>
+            
             <label for="date">Date:</label>
             <input type="datetime-local" id="date" required>
+            
+            <label for="picture_url">Picture URL:</label>
+            <input type="url" id="picture_url" oninput="previewPicture()">
+            
+            <div id="picture_preview" style="margin-top: 10px;"></div>
+            
             <button type="submit">Submit</button>
             <button type="button" onclick="closeForm()">Close</button>
         </form>
@@ -38,8 +48,10 @@
                         const messageItem = document.createElement('div');
                         messageItem.className = 'message-item';
                         messageItem.innerHTML = `
-                            <strong>${msg.message}</strong>
+                            <strong>${msg.group_name}</strong>
+                            <p>${msg.message}</p>
                             <p>Scheduled for: ${msg.date}</p>
+                            ${msg.picture_url ? `<img src="${msg.picture_url}" alt="Preview" style="max-width: 100px;">` : ''}
                             <span class="delete-btn" onclick="deleteMessage(${msg.id})">Delete</span>
                         `;
                         messagesList.appendChild(messageItem);
@@ -63,8 +75,10 @@
                         const messageItem = document.createElement('div');
                         messageItem.className = 'message-item';
                         messageItem.innerHTML = `
-                            <strong>${msg.message}</strong>
+                            <strong>${msg.group_name}</strong>
+                            <p>${msg.message}</p>
                             <p>Scheduled for: ${msg.date}</p>
+                            ${msg.picture_url ? `<img src="${msg.picture_url}" alt="Preview" style="max-width: 100px;">` : ''}
                             <span class="delete-btn" onclick="deleteMessage(${msg.id})">Delete</span>
                         `;
                         messagesList.appendChild(messageItem);
@@ -80,16 +94,29 @@
             document.getElementById('formPopup').style.display = 'none';
         }
 
+        function previewPicture() {
+            const pictureUrl = document.getElementById('picture_url').value;
+            const picturePreview = document.getElementById('picture_preview');
+            if (pictureUrl) {
+                picturePreview.innerHTML = `<img src="${pictureUrl}" alt="Preview" style="max-width: 100px;">`;
+            } else {
+                picturePreview.innerHTML = '';
+            }
+        }
+
         function createMessage(event) {
             event.preventDefault();
+            const groupName = document.getElementById('group_name').value;
             const message = document.getElementById('message').value;
             const date = document.getElementById('date').value;
+            const pictureUrl = document.getElementById('picture_url').value;
+
             fetch('/api/messages/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `message=${encodeURIComponent(message)}&date=${encodeURIComponent(date)}`
+                body: `group_name=${encodeURIComponent(groupName)}&message=${encodeURIComponent(message)}&date=${encodeURIComponent(date)}&picture_url=${encodeURIComponent(pictureUrl)}`
             }).then(() => {
                 loadMessages();
                 closeForm();
